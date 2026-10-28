@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Student> Students { get; set; }
 
+    public DbSet<Course> Courses { get; set; }
+
     protected override void OnConfiguring(
         DbContextOptionsBuilder optionsBuilder)
     {
@@ -79,6 +81,33 @@ public class AppDbContext : DbContext
                     "CK_Students_Age",
                     "[Age] BETWEEN 17 AND 60");
             });
+        });
+
+        // Course entity configuration
+        modelBuilder.Entity<Course>(entity =>
+        {
+            entity.HasKey(c => c.CourseId);
+
+            entity.Property(c => c.CourseName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(c => c.CourseName)
+                .IsUnique();
+
+            entity.Property(c => c.Credits)
+                .IsRequired();
+
+            entity.ToTable("Courses", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_Courses_Credits",
+                    "[Credits] BETWEEN 1 AND 6");
+            });
+
+            entity.Property(c => c.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
         });
     }
 }

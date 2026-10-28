@@ -21,6 +21,38 @@ namespace StudentCourseEFCore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("StudentCourseEFCore.Models.Course", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
+
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Credits")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("CourseId");
+
+                    b.HasIndex("CourseName")
+                        .IsUnique();
+
+                    b.ToTable("Courses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Courses_Credits", "[Credits] BETWEEN 1 AND 6");
+                        });
+                });
+
             modelBuilder.Entity("StudentCourseEFCore.Models.Department", b =>
                 {
                     b.Property<int>("DepartmentId")
