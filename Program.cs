@@ -1,4 +1,5 @@
-﻿using StudentCourseEFCore.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using StudentCourseEFCore.Models;
 using StudentCourseEFCore.Repositories;
 
 var repository = new DepartmentRepository();
@@ -26,8 +27,7 @@ while (true)
     {
         case 1:
             {
-                Console.Write("Enter department name: ");
-                string name = Console.ReadLine() ?? string.Empty;
+                string name = ReadRequiredInput("Enter department name: ");
 
                 Console.Write("Enter location: ");
                 string? location = Console.ReadLine();
@@ -35,14 +35,27 @@ while (true)
                 var department = new Department
                 {
                     DepartmentName = name,
-                    Location = location
+                    Location = string.IsNullOrWhiteSpace(location)
+                        ? null
+                        : location.Trim()
                 };
 
-                int id = await repository.AddAsync(department);
-
-                Console.WriteLine($"Department added successfully. ID: {id}");
+                try
+                {
+                    int id = await repository.AddAsync(department);
+                    Console.WriteLine($"Department added successfully. ID: {id}");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (DbUpdateException)
+                {
+                    Console.WriteLine("A database error occurred while adding the department.");
+                }
                 break;
             }
+
 
         case 2:
             {
@@ -105,19 +118,32 @@ while (true)
                     break;
                 }
 
-                Console.Write("Enter new department name: ");
-                string name = Console.ReadLine() ?? string.Empty;
+                string name = ReadRequiredInput("Enter new department name: ");
 
                 Console.Write("Enter new location: ");
                 string? location = Console.ReadLine();
 
-                bool updated = await repository.UpdateAsync(
-                    id, name, location);
+                location = string.IsNullOrWhiteSpace(location)
+                    ? null
+                    : location.Trim();
 
-                Console.WriteLine(
-                    updated
-                        ? "Department updated successfully."
-                        : "Department not found.");
+                try
+                {
+                    bool updated = await repository.UpdateAsync(id, name, location);
+
+                    Console.WriteLine(
+                        updated
+                            ? "Department updated successfully."
+                            : "Department not found.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (DbUpdateException)
+                {
+                    Console.WriteLine("A database error occurred while updating the department.");
+                }
 
                 break;
             }
@@ -172,3 +198,21 @@ while (true)
             break;
     }
 }
+
+static string ReadRequiredInput(string message)
+{
+    while (true)
+    {
+        Console.Write(message);
+        string? input = Console.ReadLine();
+
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            return input.Trim();
+        }
+
+        Console.WriteLine("Input cannot be empty. Please try again.");
+    }
+}
+
+

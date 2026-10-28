@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using StudentCourseEFCore.Data;
 using StudentCourseEFCore.Models;
@@ -13,9 +14,18 @@ public class DepartmentRepository
 
         db.Departments.Add(department);
 
-        await db.SaveChangesAsync();
-
-        return department.DepartmentId;
+        try
+        {
+            await db.SaveChangesAsync();
+            return department.DepartmentId;
+        }
+        catch (DbUpdateException ex)
+            when (ex.InnerException is SqlException sqlEx
+                  && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new InvalidOperationException(
+                "A department with this name already exists.", ex);
+        }
     }
 
     public async Task<List<Department>> GetAllAsync()
@@ -35,9 +45,9 @@ public class DepartmentRepository
     }
 
     public async Task<bool> UpdateAsync(
-        int id,
-        string departmentName,
-        string? location)
+    int id,
+    string departmentName,
+    string? location)
     {
         await using var db = new AppDbContext();
 
@@ -49,9 +59,18 @@ public class DepartmentRepository
         department.DepartmentName = departmentName;
         department.Location = location;
 
-        await db.SaveChangesAsync();
-
-        return true;
+        try
+        {
+            await db.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateException ex)
+            when (ex.InnerException is SqlException sqlEx
+                  && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new InvalidOperationException(
+                "A department with this name already exists.", ex);
+        }
     }
 
     public async Task<bool> DeleteAsync(int id)
