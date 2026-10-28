@@ -7,7 +7,6 @@ public class AppDbContext : DbContext
 {
     public AppDbContext()
     {
-
     }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -16,6 +15,8 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Department> Departments { get; set; }
+
+    public DbSet<Student> Students { get; set; }
 
     protected override void OnConfiguring(
         DbContextOptionsBuilder optionsBuilder)
@@ -27,11 +28,9 @@ public class AppDbContext : DbContext
         }
     }
 
-
-
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Department entity configuration
         modelBuilder.Entity<Department>(entity =>
         {
             entity.HasKey(d => d.DepartmentId);
@@ -50,8 +49,36 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValue(true);
         });
+
+        // Student-Department relationship
+        modelBuilder.Entity<Department>()
+            .HasMany(d => d.Students)
+            .WithOne(s => s.Department)
+            .HasForeignKey(s => s.DepartmentId);
+
+        // Student entity configuration
+        modelBuilder.Entity<Student>(entity =>
+        {
+            entity.HasKey(s => s.StudentId);
+
+            entity.Property(s => s.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(s => s.Email)
+                .IsRequired()
+                .HasMaxLength(450);
+
+            entity.HasIndex(s => s.Email)
+                .IsUnique();
+
+            // Database-level age validation
+            entity.ToTable("Students", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_Students_Age",
+                    "[Age] BETWEEN 17 AND 60");
+            });
+        });
     }
 }
-
-
-

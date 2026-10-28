@@ -50,6 +50,59 @@ namespace StudentCourseEFCore.Migrations
 
                     b.ToTable("Departments");
                 });
+
+            modelBuilder.Entity("StudentCourseEFCore.Models.Student", b =>
+                {
+                    b.Property<int>("StudentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentId"));
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("StudentId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Students", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Students_Age", "[Age] BETWEEN 17 AND 60");
+                        });
+                });
+
+            modelBuilder.Entity("StudentCourseEFCore.Models.Student", b =>
+                {
+                    b.HasOne("StudentCourseEFCore.Models.Department", "Department")
+                        .WithMany("Students")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("StudentCourseEFCore.Models.Department", b =>
+                {
+                    b.Navigation("Students");
+                });
 #pragma warning restore 612, 618
         }
     }

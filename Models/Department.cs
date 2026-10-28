@@ -9,5 +9,9 @@ public class Department
     public string? Location { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    // Collection navigation property
+    public ICollection<Student> Students { get; set; }
+        = new List<Student>();
 }
 
