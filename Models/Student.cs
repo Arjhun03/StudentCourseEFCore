@@ -16,4 +16,8 @@ public class Student
 
     // Navigation property
     public Department? Department { get; set; }
+
+    // Navigation property for enrollments
+    public ICollection<Enrollment> Enrollments { get; set; }
+       = new List<Enrollment>();
 }

@@ -1,5 +1,4 @@
-﻿
-using StudentCourseEFCore.Data;
+﻿using StudentCourseEFCore.Data;
 using StudentCourseEFCore.Menus;
 using StudentCourseEFCore.Repositories;
 using StudentCourseEFCore.Services;
@@ -8,9 +7,10 @@ using StudentCourseEFCore.Services;
 var departmentRepository = new DepartmentRepository();
 var studentRepository = new StudentRepository();
 
-// CourseRepository requires an AppDbContext.
 using var courseDbContext = new AppDbContext();
 var courseRepository = new CourseRepository(courseDbContext);
+
+var enrollmentRepository = new EnrollmentRepository();
 
 // 2. Create services
 var departmentService =
@@ -22,17 +22,24 @@ var studentService =
 var courseService =
     new CourseService(courseRepository);
 
-// 3. Create menu objects
+var enrollmentService =
+    new EnrollmentService(enrollmentRepository);
+
+// 3. Create menus
 var departmentMenu =
     new DepartmentMenu(departmentService);
 
 var studentMenu =
-    new StudentMenu(
-        studentService,
-        departmentService);
+    new StudentMenu(studentService, departmentService);
 
 var courseMenu =
     new CourseMenu(courseService);
+
+var enrollmentMenu =
+    new EnrollmentMenu(
+        enrollmentService,
+        studentService,
+        courseService);
 
 // 4. Main menu
 while (true)
@@ -41,6 +48,7 @@ while (true)
     Console.WriteLine("1. Department Management");
     Console.WriteLine("2. Student Management");
     Console.WriteLine("3. Course Management");
+    Console.WriteLine("4. Enrollment Management");
     Console.WriteLine("0. Exit");
 
     Console.Write("\nEnter your choice: ");
@@ -65,13 +73,17 @@ while (true)
             courseMenu.Show();
             break;
 
+        case 4:
+            await enrollmentMenu.ShowAsync();
+            break;
+
         case 0:
             Console.WriteLine("Application closed.");
             return;
 
         default:
             Console.WriteLine(
-                "Invalid choice. Select an option from 0 to 3.");
+                "Invalid choice. Select an option from 0 to 4.");
             break;
     }
 }
