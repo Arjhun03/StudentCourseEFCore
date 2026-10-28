@@ -1,47 +1,44 @@
-﻿using StudentCourseEFCore.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using StudentCourseEFCore.Data;
 using StudentCourseEFCore.Menus;
 using StudentCourseEFCore.Repositories;
 using StudentCourseEFCore.Services;
 
-// 1. Create repositories
-var departmentRepository = new DepartmentRepository();
-var studentRepository = new StudentRepository();
+var builder = Host.CreateApplicationBuilder(args);
 
-using var courseDbContext = new AppDbContext();
-var courseRepository = new CourseRepository(courseDbContext);
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        "Server=.\\SQLEXPRESS;Database=StudentCourseEFCoreDB;Trusted_Connection=True;TrustServerCertificate=True;"));
 
-var enrollmentRepository = new EnrollmentRepository();
+builder.Services.AddScoped<DepartmentRepository>();
+builder.Services.AddScoped<StudentRepository>();
+builder.Services.AddScoped<CourseRepository>();
+builder.Services.AddScoped<EnrollmentRepository>();
 
-// 2. Create services
-var departmentService =
-    new DepartmentService(departmentRepository);
+builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<EnrollmentService>();
 
-var studentService =
-    new StudentService(studentRepository);
+builder.Services.AddScoped<DepartmentMenu>();
+builder.Services.AddScoped<StudentMenu>();
+builder.Services.AddScoped<CourseMenu>();
+builder.Services.AddScoped<EnrollmentMenu>();
 
-var courseService =
-    new CourseService(courseRepository);
+using var host = builder.Build();
 
-var enrollmentService =
-    new EnrollmentService(enrollmentRepository);
+await host.StartAsync();
 
-// 3. Create menus
-var departmentMenu =
-    new DepartmentMenu(departmentService);
+using var scope = host.Services.CreateScope();
+var services = scope.ServiceProvider;
 
-var studentMenu =
-    new StudentMenu(studentService, departmentService);
+var departmentMenu = services.GetRequiredService<DepartmentMenu>();
+var studentMenu = services.GetRequiredService<StudentMenu>();
+var courseMenu = services.GetRequiredService<CourseMenu>();
+var enrollmentMenu = services.GetRequiredService<EnrollmentMenu>();
 
-var courseMenu =
-    new CourseMenu(courseService);
-
-var enrollmentMenu =
-    new EnrollmentMenu(
-        enrollmentService,
-        studentService,
-        courseService);
-
-// 4. Main menu
 while (true)
 {
     Console.WriteLine("\n===== STUDENT COURSE MANAGEMENT =====");
@@ -50,12 +47,11 @@ while (true)
     Console.WriteLine("3. Course Management");
     Console.WriteLine("4. Enrollment Management");
     Console.WriteLine("0. Exit");
-
-    Console.Write("\nEnter your choice: ");
+    Console.Write("Enter your choice: ");
 
     if (!int.TryParse(Console.ReadLine(), out int choice))
     {
-        Console.WriteLine("Invalid input. Enter a number.");
+        Console.WriteLine("Invalid input.");
         continue;
     }
 
@@ -78,12 +74,11 @@ while (true)
             break;
 
         case 0:
-            Console.WriteLine("Application closed.");
             return;
 
         default:
-            Console.WriteLine(
-                "Invalid choice. Select an option from 0 to 4.");
+            Console.WriteLine("Invalid choice.");
             break;
     }
 }
+
