@@ -6,14 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StudentCourseEFCore.Migrations
 {
-    /// <inheritdoc />
     public partial class AddEnrollmentEntity : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Student_Departments_DepartmentId",
+                name: "FK_Students_Departments_DepartmentId",
                 table: "Students");
 
             migrationBuilder.CreateTable(
@@ -70,7 +68,7 @@ namespace StudentCourseEFCore.Migrations
                 column: "StudentId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Student_Departments_DepartmentId",
+                name: "FK_Students_Departments_DepartmentId",
                 table: "Students",
                 column: "DepartmentId",
                 principalTable: "Departments",
@@ -78,18 +76,17 @@ namespace StudentCourseEFCore.Migrations
                 onDelete: ReferentialAction.Restrict);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Student_Departments_DepartmentId",
+                name: "FK_Students_Departments_DepartmentId",
                 table: "Students");
 
             migrationBuilder.DropTable(
                 name: "Enrollments");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Student_Departments_DepartmentId",
+                name: "FK_Students_Departments_DepartmentId",
                 table: "Students",
                 column: "DepartmentId",
                 principalTable: "Departments",

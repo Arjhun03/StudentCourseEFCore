@@ -10,8 +10,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        "Server=.\\SQLEXPRESS;Database=StudentCourseEFCoreDB;Trusted_Connection=True;TrustServerCertificate=True;"));
-
+        "Server=localhost,1433;Database=StudentCourseEFCoreDB;User Id=sa;Password=n3v1tnpYqFRD3b/iPU7HrhyPFBRwqs8s;Encrypt=True;TrustServerCertificate=True;"));
 builder.Services.AddScoped<DepartmentRepository>();
 builder.Services.AddScoped<StudentRepository>();
 builder.Services.AddScoped<CourseRepository>();

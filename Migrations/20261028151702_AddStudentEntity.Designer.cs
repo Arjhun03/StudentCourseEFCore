@@ -80,7 +80,7 @@ namespace StudentCourseEFCore.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Student");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("StudentCourseEFCore.Models.Student", b =>
