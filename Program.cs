@@ -8,6 +8,8 @@ using StudentCourseEFCore.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 // in the arjhun branch
+
+//sdfghjk
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         "Server=localhost,1433;Database=StudentCourseEFCoreDB;User Id=sa;Password=n3v1tnpYqFRD3b/iPU7HrhyPFBRwqs8s;Encrypt=True;TrustServerCertificate=True;"));
